@@ -5,6 +5,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.techlead.registropassagem.api.event.RecursoCriadoEvento;
 import br.com.techlead.registropassagem.api.model.Registrador;
+import br.com.techlead.registropassagem.api.model.dto.RegistradorDTO;
 import br.com.techlead.registropassagem.api.service.RegistradorService;
 import io.swagger.annotations.Api;
 
@@ -42,14 +44,18 @@ public class RegistradorController {
 	
 	@PostMapping
 	@ResponseStatus(code = HttpStatus.CREATED)
-	public ResponseEntity<Registrador> criarRegistrador(@Valid @RequestBody Registrador registrador, HttpServletResponse response) {
+	public ResponseEntity<Registrador> criarRegistrador(@Valid @RequestBody RegistradorDTO registradorDTO, HttpServletResponse response) {
+		Registrador registrador=new Registrador();
+		BeanUtils.copyProperties(registradorDTO, registrador);
 		Registrador registradorSalvo=registradorService.criarRegistrador(registrador);
 		publisher.publishEvent(new RecursoCriadoEvento(this, response, registradorSalvo.getIdRegistrador()));
 		return ResponseEntity.status(HttpStatus.CREATED).body(registradorSalvo);
 	}
 	
 	@PutMapping("/{codigo}")
-	public ResponseEntity<Registrador> alterarRegistrador(@PathVariable Long codigo,@Valid @RequestBody Registrador registrador) {
+	public ResponseEntity<Registrador> alterarRegistrador(@PathVariable Long codigo,@Valid @RequestBody RegistradorDTO registradorDTO) {
+		Registrador registrador=new Registrador();
+		BeanUtils.copyProperties(registradorDTO, registrador);
 		Registrador salvo=registradorService.alterarRegistrador(registrador, codigo);
 		return ResponseEntity.ok(salvo);
 		

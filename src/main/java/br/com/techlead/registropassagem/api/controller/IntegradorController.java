@@ -5,6 +5,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.techlead.registropassagem.api.event.RecursoCriadoEvento;
 import br.com.techlead.registropassagem.api.model.Integrador;
+import br.com.techlead.registropassagem.api.model.dto.IntegradorDTO;
 import br.com.techlead.registropassagem.api.service.IntegradorService;
 import io.swagger.annotations.Api;
 
@@ -43,14 +45,18 @@ public class IntegradorController {
 	
 	@PostMapping
 	@ResponseStatus(code = HttpStatus.CREATED)
-	public ResponseEntity<Integrador> criarIntegrador(@Valid @RequestBody Integrador integrador, HttpServletResponse response) {
+	public ResponseEntity<Integrador> criarIntegrador(@Valid @RequestBody IntegradorDTO integradorDTO, HttpServletResponse response) {
+		Integrador integrador=new Integrador();
+		BeanUtils.copyProperties(integradorDTO, integrador);
 		Integrador integradorSalvo=integradorService.criarIntegrador(integrador);
 		publisher.publishEvent(new RecursoCriadoEvento(this, response, integradorSalvo.getIdIntegrador()));
 		return ResponseEntity.status(HttpStatus.CREATED).body(integradorSalvo);
 	}
 	
 	@PutMapping("/{codigo}")
-	public ResponseEntity<Integrador> alterarIntegrador(@PathVariable Long codigo,@Valid @RequestBody Integrador integrador) {
+	public ResponseEntity<Integrador> alterarIntegrador(@PathVariable Long codigo,@Valid @RequestBody IntegradorDTO integradorDTO) {
+		Integrador integrador=new Integrador();
+		BeanUtils.copyProperties(integradorDTO, integrador);
 		Integrador salvo=integradorService.alterarIntegrador(integrador, codigo);
 		return ResponseEntity.ok(salvo);
 		

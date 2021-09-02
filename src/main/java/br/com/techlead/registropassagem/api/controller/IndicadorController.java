@@ -5,6 +5,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.techlead.registropassagem.api.event.RecursoCriadoEvento;
 import br.com.techlead.registropassagem.api.model.Indicador;
+import br.com.techlead.registropassagem.api.model.dto.IndicadorDTO;
 import br.com.techlead.registropassagem.api.service.IndicadorService;
 import io.swagger.annotations.Api;
 
@@ -44,14 +46,18 @@ public class IndicadorController {
 	
 	@PostMapping
 	@ResponseStatus(code = HttpStatus.CREATED)
-	public ResponseEntity<Indicador> criarIndicador(@Valid @RequestBody Indicador indicador, HttpServletResponse response) {
+	public ResponseEntity<Indicador> criarIndicador(@Valid @RequestBody IndicadorDTO indicadorDTO, HttpServletResponse response) {
+		Indicador indicador=new Indicador();
+		BeanUtils.copyProperties(indicadorDTO, indicador);
 		Indicador indicadorSalvo=indicadorService.criarIndicador(indicador);
 		publisher.publishEvent(new RecursoCriadoEvento(this, response, indicadorSalvo.getIdIndicador()));
 		return ResponseEntity.status(HttpStatus.CREATED).body(indicadorSalvo);
 	}
 	
 	@PutMapping("/{codigo}")
-	public ResponseEntity<Indicador> alterarIndicador(@PathVariable Long codigo,@Valid @RequestBody Indicador indicador) {
+	public ResponseEntity<Indicador> alterarIndicador(@PathVariable Long codigo,@Valid @RequestBody IndicadorDTO indicadorDTO) {
+		Indicador indicador=new Indicador();
+		BeanUtils.copyProperties(indicadorDTO, indicador);
 		Indicador salvo=indicadorService.alterarIndicador(indicador, codigo);
 		return ResponseEntity.ok(salvo);
 		

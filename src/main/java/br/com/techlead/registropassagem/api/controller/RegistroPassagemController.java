@@ -3,6 +3,7 @@ package br.com.techlead.registropassagem.api.controller;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.techlead.registropassagem.api.event.RecursoCriadoEvento;
 import br.com.techlead.registropassagem.api.model.RegistroPassagem;
+import br.com.techlead.registropassagem.api.model.dto.RegistroPassagemDTO;
 import br.com.techlead.registropassagem.api.model.dto.RegistroPassagemResumoDTO;
 import br.com.techlead.registropassagem.api.repository.filter.RegistroPassagemFilter;
 import br.com.techlead.registropassagem.api.service.RegistroPassagemService;
@@ -45,7 +47,9 @@ public class RegistroPassagemController {
 	@ApiOperation(consumes = "application/json", produces = "application/json", notes = "Registra a passagem de um origem definida (posto ou antena) a partir da placa ou chave MDFe", value="Realiza um registro de passagem ")
 	@PostMapping
 	@ResponseStatus(code = HttpStatus.CREATED)
-	public ResponseEntity<RegistroPassagem> criarRegistroPassagem(@Valid @RequestBody RegistroPassagem registroPassagem, HttpServletResponse response) {
+	public ResponseEntity<RegistroPassagem> criarRegistroPassagem(@Valid @RequestBody RegistroPassagemDTO registroPassagemDTO, HttpServletResponse response) {
+		RegistroPassagem registroPassagem=new RegistroPassagem();
+		BeanUtils.copyProperties(registroPassagemDTO, registroPassagem);
 		RegistroPassagem salvo=registroPassagemService.salvarRegistroPassagem(registroPassagem);
 		publisher.publishEvent(new RecursoCriadoEvento(this, response, salvo.getIdRegistroPassagem()));
 		return ResponseEntity.status(HttpStatus.CREATED).body(salvo);

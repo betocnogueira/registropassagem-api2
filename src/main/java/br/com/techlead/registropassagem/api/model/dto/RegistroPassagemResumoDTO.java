@@ -53,9 +53,7 @@ public class RegistroPassagemResumoDTO {
 	public String getNomeOrigem() {
 		return nomeOrigem;
 	}
-	public void setNomeAntena(String nomeOrigem) {
-		this.nomeOrigem = nomeOrigem;
-	}
+	
 	
 	public StatusRegistro getStatus() {
 		return status;

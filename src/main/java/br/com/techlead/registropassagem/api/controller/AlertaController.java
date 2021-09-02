@@ -5,6 +5,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.techlead.registropassagem.api.event.RecursoCriadoEvento;
 import br.com.techlead.registropassagem.api.model.Alerta;
 import br.com.techlead.registropassagem.api.model.AlertaMedicao;
+import br.com.techlead.registropassagem.api.model.dto.AlertaDTO;
 import br.com.techlead.registropassagem.api.repository.filter.AlertaFilter;
 import br.com.techlead.registropassagem.api.service.AlertaService;
 import io.swagger.annotations.Api;
@@ -44,14 +46,18 @@ public class AlertaController {
 	
 	@PostMapping
 	@ResponseStatus(code = HttpStatus.CREATED)
-	public ResponseEntity<Alerta> criarAlerta(@Valid @RequestBody Alerta alerta, HttpServletResponse response) {
+	public ResponseEntity<Alerta> criarAlerta(@Valid @RequestBody AlertaDTO alertaDto, HttpServletResponse response) {
+		Alerta alerta=new Alerta();
+		BeanUtils.copyProperties(alertaDto, alerta);
 		Alerta alertaSalvo=alertaService.criarAlerta(alerta);
 		publisher.publishEvent(new RecursoCriadoEvento(this, response, alertaSalvo.getIdAlerta()));
 		return ResponseEntity.status(HttpStatus.CREATED).body(alertaSalvo);
 	}
 	
 	@PutMapping("/{codigo}")
-	public ResponseEntity<Alerta> alterarAlerta(@PathVariable Long codigo,@Valid @RequestBody Alerta alerta) {
+	public ResponseEntity<Alerta> alterarAlerta(@PathVariable Long codigo,@Valid @RequestBody AlertaDTO alertaDto) {
+		Alerta alerta=new Alerta();
+		BeanUtils.copyProperties(alertaDto, alerta);
 		Alerta salvo=alertaService.alterarAlerta(alerta, codigo);
 		return ResponseEntity.ok(salvo);
 		

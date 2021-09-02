@@ -5,6 +5,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.techlead.registropassagem.api.model.Painel;
 import br.com.techlead.registropassagem.api.model.dto.ApresentacaoPainelDTO;
+import br.com.techlead.registropassagem.api.model.dto.PainelDTO;
 import br.com.techlead.registropassagem.api.model.dto.PainelResumoDTO;
 import br.com.techlead.registropassagem.api.service.PainelService;
 import io.swagger.annotations.Api;
@@ -39,13 +41,17 @@ public class PainelController {
 	
 	@PostMapping
 	@ResponseStatus(code = HttpStatus.CREATED)
-	public ResponseEntity<Painel> criarPainel(@Valid @RequestBody Painel painel, HttpServletResponse response) {
+	public ResponseEntity<Painel> criarPainel(@Valid @RequestBody PainelDTO painelDTO, HttpServletResponse response) {
+		Painel painel=new Painel();
+		BeanUtils.copyProperties(painelDTO, painel);
 		Painel retorno=painelService.criarPainel(painel);
 		return ResponseEntity.status(HttpStatus.CREATED).body(retorno);
 	}
 	
 	@PutMapping("/{codigo}")
-	public ResponseEntity<Painel> alterarPainel(@PathVariable Long codigo, @Valid @RequestBody Painel painel) {
+	public ResponseEntity<Painel> alterarPainel(@PathVariable Long codigo, @Valid @RequestBody PainelDTO painelDTO) {
+		Painel painel=new Painel();
+		BeanUtils.copyProperties(painelDTO, painel);
 		Painel retorno=painelService.alterarPainel(painel, codigo);
 		return ResponseEntity.ok(retorno);
 	}
